@@ -185,7 +185,7 @@ void Neighborhood::initialize(ulongint const &center_node, std::vector<ulongint>
 
 };
 
-std::complex<double> Neighborhood::compute_message(std::vector<std::complex<double>> const &H, std::complex<double> const &z){
+inline std::complex<double> Neighborhood::compute_message(std::vector<std::complex<double>> const &H, std::complex<double> const &z){
 
 	if (num_nodes==0) return self_loop;
 
