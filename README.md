@@ -15,9 +15,9 @@ Options:<br>
  
 For example,
 ```
-./spectrum -i example/laplacian.txt -o out.txt -r 2 -z 0,10,50,0.1
+./spectrum -i example/laplacian.txt -r 2 -z 0,10,50,0.1
 ```
-will run the algorithm on the laplacian matrix saved in laplacian.txt, and output to out.txt.  It will run using the r=2 neighborhood, and will compute the value of rho(x) at 50 points between 0 and 10. The broadening parameter, eta, will be set to 0.1.
+will run the algorithm on the laplacian matrix saved in laplacian.txt.  It will run using the r=2 neighborhood, and will compute the value of rho(x) at 50 points between 0 and 10. The broadening parameter, eta, will be set to 0.1.
 
 Tested using gcc 9.2.0.
 
