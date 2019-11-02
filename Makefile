@@ -1,4 +1,4 @@
-CC=g++-9
+CC=g++
 CFLAGS=-O3 -fopenmp -march=native -std=c++11 -I include/eigen3 
 
 spectrum_main:
