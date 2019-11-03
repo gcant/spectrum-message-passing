@@ -19,7 +19,7 @@ For example,
 ```
 will run the algorithm on the laplacian matrix saved in laplacian.txt.  It will run using the r=2 neighborhood, and will compute the value of rho(x) at 50 points between 0 and 10. The broadening parameter, eta, will be set to 0.1.
 
-By default this software uses OpenMP (libomp) to run in parallel.  If this isn't available it can be compiled to run on a single thread with `make single_thread`.
+By default this software uses OpenMP to run in parallel.  If this isn't available it can be compiled to run on a single thread with `make single_thread`.
 
 
 ## Reference
