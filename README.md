@@ -24,7 +24,7 @@ By default this software uses OpenMP to run in parallel.  If this isn't availabl
 
 ## Reference
 
-If you use this code, please consider citing:
+If you use this algorithm please cite:
 
 "[*Message passing on networks with loops*](https://arxiv.org/abs/1907.08252)"<br/>
 George T. Cantwell and M. E. J. Newman<br/>
