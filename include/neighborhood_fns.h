@@ -8,9 +8,7 @@
 typedef unsigned long long int ulongint;
 
 std::unordered_set<ulongint> find_node_neighborhood_edges(Graph &network, ulongint const &i, int const &r){
-
 	// Find the uid for each edge in the neighborhood of i, at loop length r.
-
 	std::unordered_set<ulongint> ans;
 	for (ulongint j : network.neighbors(i)){
 		ans.insert(network.uid(i,j));
@@ -64,33 +62,30 @@ struct DirectIndirectEdges{
 };
 
 
+// Find which nodes are directly connected to the center node, which
+// are indirectly connected and all edges between neighbors
 DirectIndirectEdges construct_neighborhood_from_edges(Graph &network, std::unordered_set<ulongint> &edges_in, 
 		ulongint center_node){
 
 	std::unordered_set<ulongint> direct;
 	std::unordered_set<ulongint> indirect;
-
 	std::vector<std::pair<ulongint,ulongint>> edges_out;
-	std::pair<ulongint,ulongint> temp;
-	ulongint k1,k2;
 
 
 	// find all nodes in edges_in
 	std::unordered_set<ulongint> all_nodes;
 	for (ulongint u : edges_in){
-		temp = network.uid(u);
-		k1 = temp.first; k2 = temp.second;
-		all_nodes.insert(k2);
-		all_nodes.insert(k1);
+		auto nodes = network.uid(u);
+		all_nodes.insert(nodes.first);
+		all_nodes.insert(nodes.second);
 	}
 
 	// find all nodes that are in the same component as the center node
 	DisjointSet component;
 	component.init(all_nodes);
 	for (ulongint u : edges_in){
-		temp = network.uid(u);
-		k1 = temp.first; k2 = temp.second;
-		component.join_sets(k1,k2);
+		auto nodes = network.uid(u);
+		component.join_sets(nodes.first, nodes.second);
 	}
 	std::unordered_set<ulongint> allowed_nodes = component.nodes_in_same_set(center_node);
 	allowed_nodes.insert(center_node);
@@ -98,22 +93,21 @@ DirectIndirectEdges construct_neighborhood_from_edges(Graph &network, std::unord
 	// Create a new set of the edges in the component of center node
 	std::unordered_set<ulongint> new_edges_in;
 	for (ulongint u : edges_in){
-		temp = network.uid(u);
-		k1 = temp.first; k2 = temp.second;
-		if (allowed_nodes.count(k1)) new_edges_in.insert(u);
+		if (allowed_nodes.count(network.uid(u).first)) new_edges_in.insert(u);
 	}
 	
 
+	// 
 	for (ulongint u : new_edges_in){
-		temp = network.uid(u);
-		k1 = temp.first; k2 = temp.second;
+		auto nodes= network.uid(u);
+		ulongint k1 = nodes.first, k2 = nodes.second;
 		if(k1==center_node) direct.insert(k2);
 		else if(k2==center_node) direct.insert(k1);
-		else edges_out.push_back(temp);
+		else edges_out.push_back(nodes);
 	}
 	for (ulongint u : new_edges_in){
-		temp = network.uid(u);
-		k1 = temp.first; k2 = temp.second;
+		auto nodes = network.uid(u);
+		ulongint k1 = nodes.first, k2 = nodes.second;
 		if(not(direct.count(k1))) indirect.insert(k1);
 		if(not(direct.count(k2))) indirect.insert(k2);
 	}
@@ -132,7 +126,8 @@ DirectIndirectEdges construct_neighborhood_from_edges(Graph &network, std::unord
 class Neighborhood{
 	public:
 	        void initialize(ulongint const &, std::vector<ulongint> &, 
-	        	std::vector<ulongint> &, std::vector<std::pair<ulongint,ulongint>> &, double, Graph &);
+	        	std::vector<ulongint> &,
+			std::vector<std::pair<ulongint,ulongint>> &, double, Graph &);
 		ulongint central_node;
 		ulongint M;
 		ulongint num_nodes;
@@ -143,12 +138,15 @@ class Neighborhood{
 		ulongint *message_name;
 		std::pair<ulongint,ulongint> *edges;
 		std::complex<double> *weights;
-		std::complex<double> compute_message(std::vector<std::complex<double>> const &H, std::complex<double> const &z);
-		void update_message_names(std::unordered_map<ulongint,ulongint> &, ulongint const &);
+		std::complex<double> compute_message(std::vector<std::complex<double>> const &H,
+				std::complex<double> const &z);
+		void update_message_names(std::unordered_map<ulongint,ulongint> &,
+				ulongint const &);
 };
 
 void Neighborhood::initialize(ulongint const &center_node, std::vector<ulongint> &direct_nodes_in, 
-        std::vector<ulongint> &indirect_nodes_in, std::vector<std::pair<ulongint,ulongint>> &edges_in, double self_loop_in,
+        std::vector<ulongint> &indirect_nodes_in,
+	std::vector<std::pair<ulongint,ulongint>> &edges_in, double self_loop_in,
 	Graph &network){
 
         self_loop = self_loop_in;
@@ -185,7 +183,8 @@ void Neighborhood::initialize(ulongint const &center_node, std::vector<ulongint>
 
 };
 
-inline std::complex<double> Neighborhood::compute_message(std::vector<std::complex<double>> const &H, std::complex<double> const &z){
+inline std::complex<double> Neighborhood::compute_message(std::vector<std::complex<double>> const &H,
+		std::complex<double> const &z){
 
 	if (num_nodes==0) return self_loop;
 
@@ -208,7 +207,8 @@ inline std::complex<double> Neighborhood::compute_message(std::vector<std::compl
 }
 
 
-void Neighborhood::update_message_names(std::unordered_map<ulongint,ulongint> &m_names, ulongint const &N){
+void Neighborhood::update_message_names(std::unordered_map<ulongint,ulongint> &m_names,
+		ulongint const &N){
     for (ulongint i=0; i<num_nodes; ++i){
         message_name[i] = m_names.at(central_node*N + global_name[i]);
     }
