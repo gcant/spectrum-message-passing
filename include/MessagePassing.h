@@ -45,7 +45,7 @@ int MessagePassing(std::string fname, int r, double z_real_min, double z_real_ma
 	std::unordered_map<ulongint,ulongint> edge_to_message; // location of message for edge
 	ulongint k = 0;
 	for (ulongint i=0; i<n; i++){
-		for (int x=0; x<Fnode[i].num_nodes; ++x){
+		for (unsigned int x=0; x<Fnode[i].num_nodes; ++x){
 			ulongint j = Fnode[i].global_name[x]; //node
 			ulongint u = i*n + j; //edge id
 			message_to_edge.push_back(u);
