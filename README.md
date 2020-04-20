@@ -1,6 +1,6 @@
 # Message passing for spectral density of sparse matrices
 
-This is an implementation of the message passing algorithm to compute the spectral density of sparse matrices, introduced in *[Message passing on networks with loops](https://arxiv.org/abs/1907.08252)*.
+This is an implementation of the message passing algorithm to compute the spectral density of sparse matrices, introduced in *[Message passing on networks with loops](https://doi.org/10.1073/pnas.1914893116)*.
 
 
 ## Compiling and running
@@ -26,6 +26,6 @@ By default this software uses OpenMP to run in parallel.  If this isn't availabl
 
 If you use this algorithm please cite:
 
-[*Message passing on networks with loops*](https://arxiv.org/abs/1907.08252)<br/>
+[*Message passing on networks with loops*](https://doi.org/10.1073/pnas.1914893116)<br/>
 George T. Cantwell and M. E. J. Newman<br/>
-Proc. Natl. Acad. Sci. USA (in press) <br/>
+Proc. Natl. Acad. Sci. USA 116 (2019)<br/>
