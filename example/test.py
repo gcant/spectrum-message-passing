@@ -12,9 +12,9 @@ def rho(x, eta, l):
 l = np.loadtxt("eigenvalues.txt")
 
 ## run message passing for r=0,1,2
-#os.system("../spectrum -i laplacian.txt -r 0 -z 0,10,200,0.05 -o out0.txt")
-#os.system("../spectrum -i laplacian.txt -r 1 -z 0,10,200,0.05 -o out1.txt")
-#os.system("../spectrum -i laplacian.txt -r 2 -z 0,10,200,0.05 -o out2.txt")
+os.system("../spectrum  laplacian.txt  0 0.05 0 10 100 > out0.txt")
+os.system("../spectrum  laplacian.txt  1 0.05 0 10 100 > out1.txt")
+os.system("../spectrum  laplacian.txt  2 0.05 0 10 100 > out2.txt")
 
 X0 = np.loadtxt("out0.txt")
 X1 = np.loadtxt("out1.txt")

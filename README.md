@@ -7,15 +7,17 @@ This is an implementation of the message passing algorithm to compute the spectr
 
 Run `make` to compile.
 
-Options:<br>
-+  -i &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; input file<br>
-+  -o &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; output file<br>
-+  -r &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; neighborhood level, r=0,1,2<br>
-+  -z &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; points to evaluate rho(z), format:  x_min,x_max,number_of_points,Im(z)<br>
- 
+Options are passed on command line, in the following order:
+./spectrum input_matrix.txt r eta x_min x_max num_points
+where:
+input_graph.txt is the sparse input matrix
+r is the neighborhood level (r=0,1,2,3...)
+eta is the broadening parameter
+spectral density evaluated between x_min and x_max and num_points number of points.
+
 For example,
 ```
-./spectrum -i example/laplacian.txt -r 2 -z 0,10,50,0.1
+./spectrum example/laplacian.txt  2 0.1 0 10 50
 ```
 will run the algorithm on the laplacian matrix saved in laplacian.txt.  It will run using the r=2 neighborhood, and will compute the value of rho(x) at 50 points between 0 and 10. The broadening parameter, eta, will be set to 0.1.
 

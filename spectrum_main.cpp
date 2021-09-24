@@ -1,54 +1,65 @@
-#include <string>
 #include <iostream>
-#include "include/MessagePassing.h"
-#include <unistd.h>
+#include "neighborhoods.h"
 
-int main(int argc, char* argv[]){
+const double TOL = 1.0e-11;
 
-	std::string fname = argv[1];
-	int r=1;
-	std::string outfname = "out.txt";
-	std::vector<double> z;
-	double z_real_min=-1;
-	double z_real_max=1;
-	double z_imag=0.01;
-	int num_points=100;
-	double delta_z = (z_real_max-z_real_min)/num_points;
+double run_MP(std::vector<Neighborhood> &H,
+    std::unordered_map<int,std::unordered_map<int,Neighborhood>> &H_diff,
+    WGraph &G,
+    COMPLEX &z)
+{
+  int num_nodes = G.number_of_nodes();
+  for (int s=0; s<100; ++s) {
+    double Delta = 0.0;
+    #pragma omp parallel for reduction(+:Delta)
+    for (int i=0; i<num_nodes; ++i) {
+      for (int j : H[i].nodes) {
+        Delta += H_diff[i][j].update_value(z,H_diff);
+      }
+    }
+    if (Delta < TOL) break;
+  }
 
-	int c=0;
+  #pragma omp parallel for
+  for (int i=0; i<num_nodes; ++i) {
+    H[i].update_value(z,H_diff);
+  }
 
-	while ((c = getopt (argc, argv, "i:r:o:z:")) != -1){
-		switch(c){
-			case 'i':
-				fname = optarg;
-				break;
-			case 'r':
-				r = std::stoi(optarg);
-				break;
-			case 'o':
-				outfname = optarg;
-				break;
-			case 'z':
-				std::stringstream ss(optarg);
-				while( ss.good() ){
-					std::string substr;
-					getline( ss, substr, ',' );
-					z.push_back( std::stof(substr) );
-				}
-				z_real_min = z[0];
-				z_real_max = z[1];
-				delta_z = (z_real_max-z_real_min)/z[2]; 
-				z_imag = z[3];
-				break;
-		}
-	}
+  double rho = 0.0;
+  for (int i=0; i<num_nodes; ++i){
+    rho += (1./(z-H[i].c_value)).imag();
+  }
+  rho = -rho/(num_nodes*3.14159265);
+  return rho;
+}
 
 
-	std::cout << "Computing r=" << r << " message passing for spectrum of ";
-	std::cout << fname << ", for z = " << z_real_min << ":" << z_real_max;
-	std::cout << " with Im(z)=" << z_imag << std::endl;
+int main(int argc, char* argv[]) {
+  WGraph G = read_edgelist(argv[1]);
+  int num_nodes = G.number_of_nodes();
+  int r=std::stoi(argv[2]);
+  double eps = std::stof(argv[3]);
+  double x_min = std::stof(argv[4]);
+  double x_max = std::stof(argv[5]);
+  int num_pts = std::stof(argv[6]);
+  double dx = (x_max-x_min)/num_pts;
 
-	MessagePassing(fname, r, z_real_min, z_real_max, z_imag, delta_z, outfname);
+  std::vector<Neighborhood> H(G.number_of_nodes());
+  for (int i : G.nodes())
+    H[i].init(find_neighborhood_edges(G,i,r),i,G);
 
-	return 0;
+  std::unordered_map<int,std::unordered_map<int,Neighborhood>> H_diff;
+  for (int i : G.nodes()) {
+    for (int j : H[i].nodes) {
+      auto edges = difference(G,find_neighborhood_edges(G,j,r), find_neighborhood_edges(G,i,r));
+      H_diff[i][j].init(edges,j,G);
+    }
+  }
+
+  for (double x=x_min; x<=x_max; x+=dx) {
+    COMPLEX z = {x,eps};
+    std::cout << x << " " << run_MP(H,H_diff,G,z) << std::endl;
+  }
+
+  return 0;
 }

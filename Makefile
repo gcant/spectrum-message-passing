@@ -1,5 +1,5 @@
 CC=g++
-CFLAGS=-O3 -fopenmp -march=native -std=c++11 -I include/eigen3 
+CFLAGS=-O3 -fopenmp -march=native -std=c++17 -I include/eigen3  -I include
 
 ifeq ($(shell uname -s), Darwin)
 	CC=clang++
