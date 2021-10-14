@@ -67,7 +67,7 @@ std::vector<std::pair<int,int>> find_neighborhood_edges(WGraph &G, int i, int r)
   return ans;
 }
 
-std::vector<std::pair<int,int>> intersection( WGraph &G, std::vector<std::pair<int,int>> N1, std::vector<std::pair<int,int>> N2 ){
+std::vector<std::pair<int,int>> intersection( WGraph &G, std::vector<std::pair<int,int>> const &N1, std::vector<std::pair<int,int>> const &N2 ){
   std::unordered_set<int> edges1;
   std::vector<std::pair<int,int>> edges_intersect;
   for (auto x : N1){
@@ -80,7 +80,7 @@ std::vector<std::pair<int,int>> intersection( WGraph &G, std::vector<std::pair<i
   return edges_intersect;
 }
 
-std::vector<std::pair<int,int>> difference( WGraph &G, std::vector<std::pair<int,int>> N1, std::vector<std::pair<int,int>> N2 ){
+std::vector<std::pair<int,int>> difference( WGraph &G, std::vector<std::pair<int,int>> const &N1, std::vector<std::pair<int,int>> const &N2 ){
   std::unordered_set<int> edges2;
   std::vector<std::pair<int,int>> edges_difference;
   for (auto x : N2){

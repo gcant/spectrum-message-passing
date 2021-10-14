@@ -1,7 +1,7 @@
 #include <iostream>
 #include "neighborhoods.h"
 
-const double TOL = 1.0e-11;
+const double TOL = 1.0e-8;
 
 double run_MP(std::vector<Neighborhood> &H,
     std::unordered_map<int,std::unordered_map<int,Neighborhood>> &H_diff,
@@ -17,7 +17,7 @@ double run_MP(std::vector<Neighborhood> &H,
         Delta += H_diff[i][j].update_value(z,H_diff);
       }
     }
-    if (Delta < TOL) break;
+    if (Delta < TOL*num_nodes) break;
   }
 
   #pragma omp parallel for
@@ -44,18 +44,27 @@ int main(int argc, char* argv[]) {
   int num_pts = std::stof(argv[6]);
   double dx = (x_max-x_min)/num_pts;
 
+
+  std::cerr << "Finding neighborhood edges..." << std::endl;
+  std::vector<std::vector<std::pair<int,int>>> E_r(G.number_of_nodes());
+  for (int i : G.nodes())
+    E_r[i] = find_neighborhood_edges(G,i,r);
+
+  std::cerr << "Constructing node neighborhoods..." << std::endl;
   std::vector<Neighborhood> H(G.number_of_nodes());
   for (int i : G.nodes())
-    H[i].init(find_neighborhood_edges(G,i,r),i,G);
+    H[i].init(E_r[i],i,G);
 
+  std::cerr << "Constructing message neighborhoods..." << std::endl;
   std::unordered_map<int,std::unordered_map<int,Neighborhood>> H_diff;
   for (int i : G.nodes()) {
     for (int j : H[i].nodes) {
-      auto edges = difference(G,find_neighborhood_edges(G,j,r), find_neighborhood_edges(G,i,r));
+      auto edges = difference(G,E_r[j], E_r[i]);
       H_diff[i][j].init(edges,j,G);
     }
   }
 
+  std::cerr << "Starting MP..." << std::endl;
   for (double x=x_min; x<=x_max; x+=dx) {
     COMPLEX z = {x,eps};
     std::cout << x << " " << run_MP(H,H_diff,G,z) << std::endl;
